@@ -28,8 +28,10 @@
  *      .catch((error) => console.log(error.message)) // 'Error: Wrong parameter is passed!
  *                                                    //  Ask her again.';
  */
-function willYouMarryMe(/* isPositiveAnswer */) {
-  throw new Error('Not implemented');
+function willYouMarryMe(isPositiveAnswer) {
+  if (typeof isPositiveAnswer !== 'boolean') return Promise.reject(new Error('Wrong parameter is passed! Ask her again.'));
+  if (isPositiveAnswer) return Promise.resolve('Hooray!!! She said "Yes"!');
+  return Promise.resolve('Oh no, she said "No".');
 }
 
 
@@ -48,8 +50,18 @@ function willYouMarryMe(/* isPositiveAnswer */) {
  *    })
  *
  */
-function processAllPromises(/* array */) {
-  throw new Error('Not implemented');
+function processAllPromises(array) {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    let resolved = 0;
+    for (let i = 0; i < array.length; i += 1) {
+      const p = array[i];
+      p.then((val) => results.push(val));
+      p.catch((err) => reject(err));
+      resolved += 1;
+      if (resolved >= array.length) resolve(results);
+    }
+  });
 }
 
 /**
@@ -71,8 +83,10 @@ function processAllPromises(/* array */) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return new Promise((resolve, reject) => {
+    array.forEach((p) => p.then(resolve).catch(reject));
+  });
 }
 
 /**
@@ -92,8 +106,21 @@ function getFastestPromise(/* array */) {
  *    });
  *
  */
-function chainPromises(/* array, action */) {
-  throw new Error('Not implemented');
+function chainPromises(array, action) {
+  return new Promise((resolve) => {
+    const results = [];
+    let setteled = 0;
+    array.forEach((p) => {
+      p.then((v) => {
+        results.push(v);
+        setteled += 1;
+        if (setteled >= array.length) resolve(results.reduce(action));
+      }).catch(() => {
+        setteled += 1;
+        if (setteled >= array.length) resolve(results.reduce(action));
+      });
+    });
+  });
 }
 
 module.exports = {
