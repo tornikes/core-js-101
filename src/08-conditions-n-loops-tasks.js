@@ -290,9 +290,39 @@ function reverseInteger(num) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const testData = ccn.toString();
+  function digitSum(n) {
+    let num = n;
+    let result = 0;
+    while (num > 0) {
+      const mod = num % 10;
+      result += mod;
+      num = (num - mod) / 10;
+    }
+    return result;
+  }
+
+  function computeCheck(num) {
+    const digits = [];
+    const digs = num;
+    for (let i = 0; i < digs.length; i += 1) {
+      let d = +digs[digs.length - 1 - i];
+      if (i % 2 === 0) {
+        d *= 2;
+      }
+      digits.push(digitSum(d));
+    }
+    const total = digits.reduce((a, b) => a + b);
+    const check = (10 - (total % 10)) % 10;
+    return check;
+  }
+
+  const testCheck = +testData.slice(-1);
+  const computedCheck = computeCheck(testData.slice(0, -1));
+  return testCheck === computedCheck;
 }
+
 
 /**
  * Returns the digital root of integer:
