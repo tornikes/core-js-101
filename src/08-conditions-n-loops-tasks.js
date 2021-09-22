@@ -131,8 +131,14 @@ function isTriangle(a, b, c) {
  *   { top:20, left:20, width: 20, height: 20 }    =>  false
  *
  */
-function doRectanglesOverlap(/* rect1, rect2 */) {
-  throw new Error('Not implemented');
+function doRectanglesOverlap(rect1, rect2) {
+  const verticalOverlap = (rect1.left <= rect2.left && rect1.left + rect1.width >= rect2.left)
+  || (rect2.left <= rect1.left && rect2.left + rect2.width >= rect1.left);
+
+  const horizontalOverlap = (rect1.top <= rect2.top && rect1.top + rect1.height >= rect2.top)
+  || (rect2.top <= rect1.top && rect2.top + rect2.height >= rect1.top);
+
+  return verticalOverlap && horizontalOverlap;
 }
 
 
@@ -392,8 +398,18 @@ function toNaryString(num, n) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/webalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  const splitPathes = pathes.map((p) => p.split('/'));
+  const lens = splitPathes.map((s) => s.length);
+  const len = Math.min(...lens);
+  const commonPathes = [];
+  for (let i = 0; i < len; i += 1) {
+    const segment = splitPathes[0][i];
+    if (splitPathes.every((s) => s[i] === segment)) {
+      commonPathes.push(segment);
+    }
+  }
+  return `${commonPathes.join('/')}${commonPathes.length ? '/' : ''}`;
 }
 
 
