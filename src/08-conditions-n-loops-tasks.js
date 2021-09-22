@@ -466,8 +466,46 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  function checkHorizontals(pos, c) {
+    if (
+      (pos[0][0] === c && pos[0][1] === c && pos[0][2] === c)
+      || (pos[1][0] === c && pos[1][1] === c && pos[1][2] === c)
+      || (pos[2][0] === c && pos[2][1] === c && pos[2][2] === c)
+    ) {
+      return c;
+    }
+    return false;
+  }
+
+  function checkVerticals(pos, c) {
+    if (
+      (pos[0][0] === c && pos[1][0] === c && pos[2][0] === c)
+      || (pos[0][1] === c && pos[1][1] === c && pos[2][1] === c)
+      || (pos[0][2] === c && pos[1][2] === c && pos[2][2] === c)
+    ) {
+      return c;
+    }
+    return false;
+  }
+
+  function checkDiagonals(pos, c) {
+    if (
+      (pos[0][0] === c && pos[1][1] === c && pos[2][2] === c)
+      || (pos[0][2] === c && pos[1][1] === c && pos[2][0] === c)
+    ) {
+      return c;
+    }
+    return false;
+  }
+
+  if (checkVerticals(position, 'X') || checkHorizontals(position, 'X') || checkDiagonals(position, 'X')) {
+    return 'X';
+  }
+  if (checkVerticals(position, '0') || checkHorizontals(position, '0') || checkDiagonals(position, '0')) {
+    return '0';
+  }
+  return undefined;
 }
 
 
