@@ -117,33 +117,136 @@ function fromJSON(proto, json) {
  *  For more examples see unit tests.
  */
 
+class SimpleSelector {
+  constructor() {
+    this.el = null;
+    this.elId = null;
+    this.classes = [];
+    this.attribute = null;
+    this.pseudoClassEl = [];
+    this.pseudoElementEl = [];
+  }
+
+  element(el) {
+    if (this.elId || this.classes.length || this.attribute
+        || this.pseudoClassEl.length || this.pseudoElementEl.length) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.el) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    this.el = el;
+    return el;
+  }
+
+  id(val) {
+    if (this.classes.length || this.attribute
+      || this.pseudoClassEl.length || this.pseudoElementEl.length) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.elId) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    this.elId = val;
+    return this;
+  }
+
+  class(...vals) {
+    if (this.attribute || this.pseudoClassEl.length || this.pseudoElementEl.length) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.classes.push(...vals);
+    return this;
+  }
+
+  attr(value) {
+    if (this.pseudoClassEl.length || this.pseudoElementEl.length) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.attribute = value;
+    return this;
+  }
+
+  pseudoClass(...values) {
+    if (this.pseudoElementEl.length) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.pseudoClassEl.push(...values);
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.pseudoElementEl.length) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    this.pseudoElementEl.push(value);
+    return this;
+  }
+
+  stringify() {
+    let output = '';
+    if (this.el) {
+      output += this.el;
+    }
+    if (this.elId) {
+      output += `#${this.elId}`;
+    }
+    if (this.classes.length) {
+      output += `.${this.classes.join('.')}`;
+    }
+    if (this.attribute) {
+      output += `[${this.attribute}]`;
+    }
+    if (this.pseudoClassEl.length) {
+      output += `:${this.pseudoClassEl.join(':')}`;
+    }
+    if (this.pseudoElementEl.length) {
+      output += `::${this.pseudoElementEl.join('::')}`;
+    }
+    return output;
+  }
+}
+
+function CombinedSelector(s1, sep, s2) {
+  this.s1 = s1;
+  this.sep = sep;
+  this.s2 = s2;
+}
+
+CombinedSelector.prototype.stringify = function stringify() {
+  return `${this.s1.stringify()} ${this.sep} ${this.s2.stringify()}`;
+};
+
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    const s = new SimpleSelector();
+    s.el = value;
+    return s;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new SimpleSelector().id(value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new SimpleSelector().class(value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new SimpleSelector().attr(value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new SimpleSelector().pseudoClass(value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new SimpleSelector().pseudoElement(value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return new CombinedSelector(selector1, combinator, selector2);
   },
 };
 
